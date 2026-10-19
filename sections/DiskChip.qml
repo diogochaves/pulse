@@ -57,7 +57,7 @@ Item {
             var x=cx-body/2, y=cy-body/2, t=root.phase*Math.PI*2
             var act=Model.clamp(root.activity,0,1), rd=Model.clamp(root.reading,0,1), wr=Model.clamp(root.writing,0,1)
             var aura=c.createRadialGradient(cx,cy,body*0.1,cx,cy,size*0.5)
-            aura.addColorStop(0,Qt.alpha(root.tint,0.30+0.25*act)); aura.addColorStop(0.6,Qt.alpha(root.tint,0.20+0.07*Math.sin(t))); aura.addColorStop(1,'transparent')
+            aura.addColorStop(0,Qt.alpha(root.tint,0.30+0.25*act)); aura.addColorStop(0.6,Qt.alpha(root.tint,0.20+0.07*Math.sin(t))); aura.addColorStop(1,Qt.rgba(0,0,0,0))
             c.fillStyle=aura; c.fillRect(0,0,w,h)
             if (!root.compact) {
                 for(var ring=0;ring<3;ring++) {
@@ -98,7 +98,7 @@ Item {
             // Read/write beam: sweeps the map at a pace that quickens with traffic.
             var sweep=((root.phase*(1+act*3))%1)*(body+16)-8
             var beam=c.createLinearGradient(0,y+sweep-8,0,y+sweep+8)
-            beam.addColorStop(0,'transparent'); beam.addColorStop(0.5,Qt.alpha(root.glint,(root.compact?0.22:0.28)+0.2*act)); beam.addColorStop(1,'transparent')
+            beam.addColorStop(0,Qt.rgba(0,0,0,0)); beam.addColorStop(0.5,Qt.alpha(root.glint,(root.compact?0.22:0.28)+0.2*act)); beam.addColorStop(1,Qt.rgba(0,0,0,0))
             c.fillStyle=beam; c.fillRect(x,y+sweep-8,body,16)
             c.restore()
             c.strokeStyle=root.tint;c.lineWidth=root.compact?1:2

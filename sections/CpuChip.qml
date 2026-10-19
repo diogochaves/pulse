@@ -54,7 +54,7 @@ Item {
             var cx=w/2, cy=h/2, size=Math.min(w,h), body=size*(root.compact?0.58:0.47)
             var x=cx-body/2, y=cy-body/2, t=root.phase*Math.PI*2
             var aura=c.createRadialGradient(cx,cy,body*0.1,cx,cy,size*0.5)
-            aura.addColorStop(0,Qt.alpha(root.tint,0.30+0.25*root.level)); aura.addColorStop(0.6,Qt.alpha(root.tint,0.20+0.07*Math.sin(t))); aura.addColorStop(1,'transparent')
+            aura.addColorStop(0,Qt.alpha(root.tint,0.30+0.25*root.level)); aura.addColorStop(0.6,Qt.alpha(root.tint,0.20+0.07*Math.sin(t))); aura.addColorStop(1,Qt.rgba(0,0,0,0))
             c.fillStyle=aura; c.fillRect(0,0,w,h)
             if (!root.compact) {
                 for(var ring=0;ring<3;ring++) {
@@ -98,7 +98,7 @@ Item {
             // Clock beam: sweeps the die at a pace that quickens with load.
             var sweep=((root.phase*(1+root.level*2))%1)*(body+16)-8
             var beam=c.createLinearGradient(x+sweep-8,0,x+sweep+8,0)
-            beam.addColorStop(0,'transparent'); beam.addColorStop(0.5,Qt.alpha(root.glint,root.compact?0.28:0.36)); beam.addColorStop(1,'transparent')
+            beam.addColorStop(0,Qt.rgba(0,0,0,0)); beam.addColorStop(0.5,Qt.alpha(root.glint,root.compact?0.28:0.36)); beam.addColorStop(1,Qt.rgba(0,0,0,0))
             c.fillStyle=beam; c.fillRect(x+sweep-8,y,16,body)
             c.strokeStyle=Qt.alpha(root.tint,0.35);c.lineWidth=0.8
             for(var line=1;line<4;line++){ c.beginPath();c.moveTo(x,y+body*line/4);c.lineTo(x+body,y+body*line/4);c.stroke() }

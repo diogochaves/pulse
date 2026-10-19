@@ -60,7 +60,7 @@ Item {
             var aura = c.createRadialGradient(cx, cy, pack * 0.1, cx, cy, size * 0.5)
             aura.addColorStop(0, Qt.alpha(root.tint, 0.20 + 0.30 * load))
             aura.addColorStop(0.6, Qt.alpha(root.tint, 0.10 + 0.14 * load * (0.8 + 0.2 * Math.sin(t))))
-            aura.addColorStop(1, 'transparent')
+            aura.addColorStop(1, Qt.rgba(0,0,0,0))
             c.fillStyle = aura; c.fillRect(0, 0, w, h)
 
             c.fillStyle = root.body

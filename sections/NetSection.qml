@@ -4,6 +4,7 @@ import Quickshell.Networking
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "NetModel.js" as Model
 import "Constraints.js" as Constraints
@@ -29,7 +30,7 @@ Item {
     // lost signal dims the bar's own ink instead of `muted`, a colour chosen to
     // sit on a slab.
     readonly property bool barTransparent: root.bar ? root.bar.transparent === true : false
-    readonly property color barInk: root.bar ? root.bar.barForeground : Color.foreground
+    readonly property color barInk: root.bar ? root.bar.barForeground : Commons.Color.foreground
     readonly property color barTint: (root.stale && root.barTransparent) ? Util.alpha(root.barInk, 0.55) : root.tint
     // The caption beneath the chip is 7px text, not a stroke: at the chip's
     // dimmed alpha its thin glyphs measure barely above the wallpaper, so it
@@ -77,7 +78,7 @@ Item {
     // a theme whose three stops are really one colour.
     property string palette: ''
     readonly property var rampStops: Model.rampStops(palette)
-    readonly property color tint: stale ? Color.muted : Model.ramp(health, rampStops)
+    readonly property color tint: stale ? Commons.Color.muted : Model.ramp(health, rampStops)
     readonly property string chipKind: stale || !net.online ? 'offline' : (Model.isWifi(net) ? 'wifi' : 'ethernet')
     readonly property real activity: Model.clamp(((net.rates||{}).rx||0)/8e6, 0, 1)
     readonly property var rows: (net.talkers||{}).rows || []
@@ -106,23 +107,23 @@ Item {
     // hold up on a light theme too. The chip's health tint is the deliberate
     // exception: red-amber-green is a reading, not decoration, and it is what
     // makes this widget a sibling of CPU Pulse and RAM Pulse beside it.
-    readonly property color themeFg: bar ? bar.foreground : Color.foreground
-    readonly property color themeAccent: Color.accent
-    readonly property color themeUrgent: bar ? bar.urgent : Color.urgent
-    readonly property color panelBg: Color.popups.background
-    readonly property color panelText: Color.popups.text
+    readonly property color themeFg: bar ? bar.foreground : Commons.Color.foreground
+    readonly property color themeAccent: Commons.Color.accent
+    readonly property color themeUrgent: bar ? bar.urgent : Commons.Color.urgent
+    readonly property color panelBg: Commons.Color.popups.background
+    readonly property color panelText: Commons.Color.popups.text
     readonly property color surface: Model.mix(panelBg, panelText, 0.05)
     readonly property color surfaceRaised: Model.mix(panelBg, panelText, 0.08)
     readonly property color surfaceHot: Model.mix(panelBg, panelText, 0.12)
     readonly property color accentSurface: Model.mix(panelBg, themeAccent, 0.12)
     readonly property color accentBorder: Model.mix(panelBg, themeAccent, 0.34)
     readonly property color accentHot: Model.mix(themeAccent, panelText, 0.45)
-    readonly property color cardBorder: Model.mix(panelBg, Color.popups.border, 0.5)
+    readonly property color cardBorder: Model.mix(panelBg, Commons.Color.popups.border, 0.5)
     readonly property color hairline: Model.mix(panelBg, panelText, 0.17)
     readonly property color hairlineHot: Model.mix(panelBg, panelText, 0.33)
     readonly property color gridLine: Model.mix(panelBg, panelText, 0.12)
-    readonly property color bodyText: Color.muted
-    readonly property color dimText: Model.mix(panelBg, Color.muted, 0.72)
+    readonly property color bodyText: Commons.Color.muted
+    readonly property color dimText: Model.mix(panelBg, Commons.Color.muted, 0.72)
     readonly property color captionText: Model.mix(panelBg, panelText, 0.78)
 
     // ---- NetworkManager objects for Wi-Fi actions (passphrases never touch argv)
@@ -286,7 +287,7 @@ Item {
     // over IPC, so the watcher alone would strand the ramp on the previous
     // theme. Re-read whenever the shell's own colours move, which is exactly
     // when that push lands.
-    readonly property string themeSignature: String(Color.background)+String(Color.foreground)+String(Color.accent)+String(Color.urgent)
+    readonly property string themeSignature: String(Commons.Color.background)+String(Commons.Color.foreground)+String(Commons.Color.accent)+String(Commons.Color.urgent)
     onThemeSignatureChanged: paletteFile.reload()
     // Width floors for the bar readout, measured by hidden labels rather than by
     // TextMetrics: only an identical Text arrives at an identical implicitWidth,
@@ -353,9 +354,9 @@ Item {
     readonly property var topConstraints: root.constraints.slice(0, 3)
     readonly property string headline: root.stale ? '—' : Model.readout(root.net, root.mode)
     readonly property string tag: Model.modeTag(root.net, root.mode)
-    property Component barChip: Component { NetChip {compact:true;body:root.barTransparent?'transparent':Color.bar.background;kind:root.chipKind;level:root.health/100;activity:root.activity;tint:root.barTint;stops:root.rampStops;animate:!root.stale && root.setting('animated',true)} }
-    property Component cardChip: Component { NetChip {width:88;height:88;body:Color.popups.background;kind:root.chipKind;level:root.health/100;activity:root.activity;tint:root.tint;stops:root.rampStops;animate:root.cardLive} }
-    property Component cardGraph: Component { NetHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;latencyTint:root.themeUrgent;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Color.tooltip.background;tipBorder:Color.tooltip.border;tipText:Color.tooltip.text} }
+    property Component barChip: Component { NetChip {compact:true;body:root.barTransparent?'transparent':Commons.Color.bar.background;kind:root.chipKind;level:root.health/100;activity:root.activity;tint:root.barTint;stops:root.rampStops;animate:!root.stale && root.setting('animated',true)} }
+    property Component cardChip: Component { NetChip {width:88;height:88;body:Commons.Color.popups.background;kind:root.chipKind;level:root.health/100;activity:root.activity;tint:root.tint;stops:root.rampStops;animate:root.cardLive} }
+    property Component cardGraph: Component { NetHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;latencyTint:root.themeUrgent;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Commons.Color.tooltip.background;tipBorder:Commons.Color.tooltip.border;tipText:Commons.Color.tooltip.text} }
 
     component Label: Text { color:root.bodyText;font.pixelSize:12;textFormat:Text.PlainText }
     component Heading: Text { color:root.panelText;font.pixelSize:15;font.bold:true;textFormat:Text.PlainText }
@@ -502,7 +503,7 @@ Item {
                                 }
                             }
                             NetHistoryGraph{width:parent.width;height:139;historyData:root.chart;tint:root.tint
-                            latencyTint:root.themeUrgent;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Color.tooltip.background;tipBorder:Color.tooltip.border;tipText:Color.tooltip.text}
+                            latencyTint:root.themeUrgent;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Commons.Color.tooltip.background;tipBorder:Commons.Color.tooltip.border;tipText:Commons.Color.tooltip.text}
                             Row{spacing:14
                                 Label{text:'━ Download';color:root.tint;font.pixelSize:10}
                                 Label{text:'━ Upload';color:root.themeAccent;font.pixelSize:10}
@@ -736,7 +737,7 @@ Item {
                     }
                     Rectangle{width:parent.width;height:184;radius:14;color:root.surface;border.color:root.hairline
                         UsageGraph{anchors.fill:parent;anchors.margins:11;usageData:root.usageChart;tint:root.tint
-                            baseLine:root.hairline;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Color.tooltip.background;tipBorder:Color.tooltip.border;tipText:Color.tooltip.text
+                            baseLine:root.hairline;upTint:root.themeAccent;axisText:root.dimText;gridLine:root.gridLine;tipBackground:Commons.Color.tooltip.background;tipBorder:Commons.Color.tooltip.border;tipText:Commons.Color.tooltip.text
                             visible:(root.usageChart.points||[]).length>0}
                         Label{anchors.centerIn:parent;visible:(root.usageChart.points||[]).length===0
                             text:'Nothing recorded in '+Model.rangeWhen(root.usageRange)+' yet.'}

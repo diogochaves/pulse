@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 
 // The page that only exists because the four are together: how is this machine,
@@ -16,7 +17,7 @@ Item {
     width: parent ? parent.width : 0
     implicitHeight: grid.implicitHeight + 10 + footer.implicitHeight
 
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)

@@ -3,6 +3,7 @@ import QtQuick.Controls
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "sections"
 import "Model.js" as Model
@@ -56,7 +57,7 @@ Panel {
     // Theme roles. One decision — the popup text colour — drives the whole
     // surface, exactly as each of the four plugins did on its own, so the
     // merged chrome sits in the same visual language as the ported bodies.
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)
@@ -407,7 +408,7 @@ Panel {
                     event.accepted = true
                 }
             }
-            Rectangle { anchors.fill: parent; anchors.margins: -10; radius: 14; color: Color.popups.background }
+            Rectangle { anchors.fill: parent; anchors.margins: -10; radius: 14; color: Commons.Color.popups.background }
 
             Flickable {
                 id: scroller

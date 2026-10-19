@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "Constraints.js" as C
 
@@ -21,7 +22,7 @@ Item {
     width: parent ? parent.width : 0
     implicitHeight: column.implicitHeight
 
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)
@@ -52,7 +53,7 @@ Item {
     // One colour scale for severity, independent of any domain's own tint, so
     // a red bar means the same thing in every row on the page.
     function severityColor(severity) {
-        if (severity >= 0.85) return Color.urgent
+        if (severity >= 0.85) return Commons.Color.urgent
         if (severity >= 0.62) return Qt.rgba(0.92, 0.66, 0.25, 1)
         if (severity >= 0.34) return Qt.rgba(0.85, 0.80, 0.35, 1)
         return Util.alpha(root.ink, 0.45)

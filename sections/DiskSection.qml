@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "DiskModel.js" as Model
 import "Constraints.js" as Constraints
@@ -30,7 +31,7 @@ Item {
     // reading (stale, or no capacity known) dims the bar's own ink instead of
     // `muted`, which is a colour chosen to sit on a slab.
     readonly property bool barTransparent: root.bar ? root.bar.transparent === true : false
-    readonly property color barInk: root.bar ? root.bar.barForeground : Color.foreground
+    readonly property color barInk: root.bar ? root.bar.barForeground : Commons.Color.foreground
     readonly property color barTint: ((root.stale || !root.capacityKnown) && root.barTransparent) ? Util.alpha(root.barInk, 0.55) : root.tint
     // The caption beneath the chip is 7px text, not a stroke: at the chip's
     // dimmed alpha its thin glyphs measure barely above the wallpaper, so it
@@ -56,11 +57,11 @@ Item {
     // yellow and green for the headroom ramp. Card fills and strokes are the
     // foreground laid over the popup background at low alpha, so they follow a
     // light theme as readily as a dark one instead of assuming either.
-    readonly property color themeText: Color.popups.text
-    readonly property color themeBg: Color.popups.background
-    readonly property color themeAccent: Color.accent
-    readonly property color themeMuted: Color.muted
-    readonly property color themeUrgent: Color.urgent
+    readonly property color themeText: Commons.Color.popups.text
+    readonly property color themeBg: Commons.Color.popups.background
+    readonly property color themeAccent: Commons.Color.accent
+    readonly property color themeMuted: Commons.Color.muted
+    readonly property color themeUrgent: Commons.Color.urgent
     readonly property color themeSoft: Qt.alpha(themeText,0.78)
     readonly property color surfaceIdle: Qt.tint(themeBg,Qt.alpha(themeText,0.03))
     readonly property color surface: Qt.tint(themeBg,Qt.alpha(themeText,0.05))
@@ -257,7 +258,7 @@ Item {
     // can see: the shell loads it once at startup and has the new palette
     // pushed to Color over IPC instead. So re-read the file whenever the
     // shell's own colours move, which is exactly when that push lands.
-    readonly property string themeSignature: String(Color.background)+String(Color.foreground)+String(Color.accent)+String(Color.urgent)
+    readonly property string themeSignature: String(Commons.Color.background)+String(Commons.Color.foreground)+String(Commons.Color.accent)+String(Commons.Color.urgent)
     onThemeSignatureChanged: themePalette.reload()
     Timer { interval:3000; running:true; repeat:true; onTriggered:{root.now=Date.now()/1000; if(root.stale)snapshotFile.reload()} }
     Process {
@@ -313,7 +314,7 @@ Item {
     readonly property string headline: root.stale ? '—' : Model.readout(root.disk, root.mode, root.mountpoint)
     readonly property string tag: Model.modeTag(root.disk, root.mode)
     property Component barChip: Component { DiskChip {compact:true;body:root.barTransparent?'transparent':root.themeBg;glint:root.barForeground;free:root.chipFree;activity:root.activity;reading:root.reading;writing:root.writing;tint:root.barTint;animate:!root.stale && root.setting('animated',true)} }
-    property Component cardChip: Component { DiskChip {width:88;height:88;body:Color.popups.background;glint:root.themeText;free:root.chipFree;activity:root.activity;reading:root.reading;writing:root.writing;tint:root.tint;animate:root.cardLive} }
+    property Component cardChip: Component { DiskChip {width:88;height:88;body:Commons.Color.popups.background;glint:root.themeText;free:root.chipFree;activity:root.activity;reading:root.reading;writing:root.writing;tint:root.tint;animate:root.cardLive} }
     property Component cardGraph: Component { DiskHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;writeTint:root.themeAccent;busyTint:root.rampWarn;usedTint:root.themeText;grid:root.stroke;axisText:root.themeMuted;crosshair:root.strokeStrong;hoverBackground:root.surfaceHover;hoverBorder:root.stroke;hoverForeground:root.themeText;fontFamily:root.themeFont} }
 
     component Label: Text {

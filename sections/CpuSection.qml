@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "CpuModel.js" as Model
 import "Constraints.js" as Constraints
@@ -30,7 +31,7 @@ Item {
     // wallpaper while the live state still looks right. The outline and the lit
     // cells carry the chip on their own.
     readonly property bool barTransparent: root.bar ? root.bar.transparent === true : false
-    readonly property color barInk: root.bar ? root.bar.barForeground : Color.foreground
+    readonly property color barInk: root.bar ? root.bar.barForeground : Commons.Color.foreground
     readonly property color barTint: (root.stale && root.barTransparent) ? Util.alpha(root.barInk, 0.55) : root.tint
     // The caption beneath the chip is 7px text, not a stroke: at the chip's
     // dimmed alpha its thin glyphs measure barely above the wallpaper, so it
@@ -60,7 +61,7 @@ Item {
     // strength, which keeps one decision driving the whole surface. Buttons
     // use the shell's own control-state fills, so a theme that tunes those
     // tunes this panel with them.
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)
@@ -79,7 +80,7 @@ Item {
     property real now: Date.now()/1000
     readonly property bool stale: !cpu.ts || now-cpu.ts > 15
     readonly property int mode: Model.clamp(setting('displayMode',0),0,3)
-    readonly property color tint: stale ? Color.muted : Model.ramp(cpu.idlePct, rampStops)
+    readonly property color tint: stale ? Commons.Color.muted : Model.ramp(cpu.idlePct, rampStops)
     readonly property real pressure: cpu.psi && cpu.psi.some ? cpu.psi.some.avg10 : 0
     readonly property var rows: cpu.hogs || []
     onRowsChanged: page=Math.min(page,Math.max(0,Math.ceil(rows.length/8)-1))
@@ -133,7 +134,7 @@ Item {
         onLoadFailed:root.palette=''
     }
     Connections {
-        target:Color
+        target:Commons.Color
         function onBackgroundChanged() {paletteFile.reload()}
         function onAccentChanged() {paletteFile.reload()}
     }
@@ -194,9 +195,9 @@ Item {
     }
     readonly property string headline: root.stale ? '—' : Model.readout(root.cpu, root.mode)
     readonly property string tag: Model.modeTag(root.mode)
-    property Component barChip: Component { CpuChip {compact:true;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.barTint;stops:root.rampStops;dieFill:root.barTransparent?'transparent':Color.background;glint:root.barInk;animate:!root.stale && root.setting('animated',true)} }
-    property Component cardChip: Component { CpuChip {width:88;height:88;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Color.popups.background;glint:root.ink;animate:root.cardLive} }
-    property Component cardGraph: Component { CpuHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;heat:root.heat;ink:root.ink;surface:Color.popups.background} }
+    property Component barChip: Component { CpuChip {compact:true;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.barTint;stops:root.rampStops;dieFill:root.barTransparent?'transparent':Commons.Color.background;glint:root.barInk;animate:!root.stale && root.setting('animated',true)} }
+    property Component cardChip: Component { CpuChip {width:88;height:88;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Commons.Color.popups.background;glint:root.ink;animate:root.cardLive} }
+    property Component cardGraph: Component { CpuHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;heat:root.heat;ink:root.ink;surface:Commons.Color.popups.background} }
 
     component Label: Text {
         color:root.inkDim;font.pixelSize:12;textFormat:Text.PlainText
@@ -262,7 +263,7 @@ Item {
                     Rectangle {
                         width:parent.width;height:170;radius:16;border.color:Qt.alpha(root.tint,0.45)
                         gradient:Gradient {GradientStop{position:0;color:Qt.alpha(root.tint,0.13)}GradientStop{position:1;color:root.card}}
-                        CpuChip {id:heroChip;x:12;y:5;width:160;height:160;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Color.background;glint:root.ink;animate:root.opened&&root.tab===0&&!root.stale&&root.setting('animated',true)}
+                        CpuChip {id:heroChip;x:12;y:5;width:160;height:160;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Commons.Color.background;glint:root.ink;animate:root.opened&&root.tab===0&&!root.stale&&root.setting('animated',true)}
                         Column {x:188;y:20;spacing:6
                             Label{text:'PROCESSOR BUSY';font.pixelSize:11;font.letterSpacing:2}
                             Row {spacing:10
@@ -287,7 +288,7 @@ Item {
                                     Action{required property var modelData;text:modelData.t;selected:root.range===modelData.s;implicitWidth:68;implicitHeight:28;onClicked:root.range=modelData.s}
                                 }
                             }
-                            CpuHistoryGraph{width:parent.width;height:139;historyData:root.chart;tint:root.tint;heat:root.heat;ink:root.ink;surface:Color.popups.background}
+                            CpuHistoryGraph{width:parent.width;height:139;historyData:root.chart;tint:root.tint;heat:root.heat;ink:root.ink;surface:Commons.Color.popups.background}
                             Row{spacing:14
                                 Label{text:'━ CPU busy';color:root.tint;font.pixelSize:10}
                                 Label{text:'━ Package °C';color:root.heat;font.pixelSize:10}
@@ -300,13 +301,13 @@ Item {
                         Column{id:coreColumn;anchors.fill:parent;anchors.margins:14;spacing:9
                             Row{width:parent.width
                                 Heading{text:'EVERY THREAD';font.pixelSize:12;width:parent.width/2}
-                                Label{text:root.cores.filter(function(c){return c.busy>=50}).length+' of '+root.cores.length+' above half load';width:parent.width/2;horizontalAlignment:Text.AlignRight;color:Color.accent}
+                                Label{text:root.cores.filter(function(c){return c.busy>=50}).length+' of '+root.cores.length+' above half load';width:parent.width/2;horizontalAlignment:Text.AlignRight;color:Commons.Color.accent}
                             }
                             Grid{id:threadGrid;width:parent.width;columns:Math.max(1,Math.min(Math.max(6,Math.floor((coreColumn.width+8)/96)),root.cores.length));columnSpacing:8;rowSpacing:8
                                 Repeater{model:root.cores
                                     Column{required property var modelData;width:(coreColumn.width-8*(threadGrid.columns-1))/threadGrid.columns;spacing:4
                                         Row{width:parent.width
-                                            Label{text:'T'+modelData.id;font.pixelSize:10;color:Color.accent;width:parent.width/2}
+                                            Label{text:'T'+modelData.id;font.pixelSize:10;color:Commons.Color.accent;width:parent.width/2}
                                             Label{text:Model.pct(modelData.busy);font.pixelSize:10;width:parent.width/2;horizontalAlignment:Text.AlignRight;color:root.ink}
                                         }
                                         Rectangle{width:parent.width;height:5;radius:3;color:Util.alpha(root.ink,0.13)
@@ -380,16 +381,16 @@ Item {
                         }
                     }
                     Column{width:parent.width;spacing:7
-                        Label{width:parent.width;text:(root.cpu.freq?root.cpu.freq.driver+' · '+root.cpu.freq.governor+' governor'+(root.cpu.freq.epp?' · '+root.cpu.freq.epp+' preference':'')+' · turbo '+(root.cpu.freq.turbo===true?'on':root.cpu.freq.turbo===false?'off':'unknown')+' · base '+Model.ghz(root.cpu.freq.base):'Frequency driver unavailable')+'  ·  throttled '+((root.cpu.throttle||{}).package||0)+'× since boot'+(root.cpu.watts!==null&&root.cpu.watts!==undefined?'  ·  '+root.cpu.watts.toFixed(1)+' W package':'');color:Util.alpha(Color.accent,0.78);font.pixelSize:11;wrapMode:Text.WordWrap}
-                        Label{width:parent.width;text:(root.cpu.sensors||[]).map(function(s){return s.label+' '+Model.temp(s.temp)}).join('  ·  ') || 'No CPU temperature sensors exposed';color:Util.alpha(Color.accent,0.78);font.pixelSize:11;wrapMode:Text.WordWrap}
+                        Label{width:parent.width;text:(root.cpu.freq?root.cpu.freq.driver+' · '+root.cpu.freq.governor+' governor'+(root.cpu.freq.epp?' · '+root.cpu.freq.epp+' preference':'')+' · turbo '+(root.cpu.freq.turbo===true?'on':root.cpu.freq.turbo===false?'off':'unknown')+' · base '+Model.ghz(root.cpu.freq.base):'Frequency driver unavailable')+'  ·  throttled '+((root.cpu.throttle||{}).package||0)+'× since boot'+(root.cpu.watts!==null&&root.cpu.watts!==undefined?'  ·  '+root.cpu.watts.toFixed(1)+' W package':'');color:Util.alpha(Commons.Color.accent,0.78);font.pixelSize:11;wrapMode:Text.WordWrap}
+                        Label{width:parent.width;text:(root.cpu.sensors||[]).map(function(s){return s.label+' '+Model.temp(s.temp)}).join('  ·  ') || 'No CPU temperature sensors exposed';color:Util.alpha(Commons.Color.accent,0.78);font.pixelSize:11;wrapMode:Text.WordWrap}
                     }
-                    Rectangle{width:parent.width;height:152;radius:12;color:Util.alpha(Color.accent,0.09);border.color:Util.alpha(Color.accent,0.38)
+                    Rectangle{width:parent.width;height:152;radius:12;color:Util.alpha(Commons.Color.accent,0.09);border.color:Util.alpha(Commons.Color.accent,0.38)
                         Column{anchors.fill:parent;anchors.margins:14;spacing:9
                             Heading{text:'POWER PROFILE';font.pixelSize:12}
                             Label{width:parent.width;wrapMode:Text.WordWrap;text:root.cpu.profile?'power-profiles-daemon shapes clocks and thermals for the whole machine. Changes apply immediately and are fully reversible here. Performance costs battery and heat; power-saver costs responsiveness.':'power-profiles-daemon is not running, so profiles cannot be switched from here.';font.pixelSize:11;color:root.inkDim}
                             Row{spacing:8
                                 Repeater{model:['power-saver','balanced','performance']
-                                    Action{required property string modelData;text:actionProc.running&&root.actionStatus.indexOf('Asking')===0?'Working…':modelData;accent:Color.accent;selected:root.cpu.profile===modelData;opacity:root.cpu.profile?1:0.4;onClicked:if(root.cpu.profile)root.runAction('profile',[modelData])}
+                                    Action{required property string modelData;text:actionProc.running&&root.actionStatus.indexOf('Asking')===0?'Working…':modelData;accent:Commons.Color.accent;selected:root.cpu.profile===modelData;opacity:root.cpu.profile?1:0.4;onClicked:if(root.cpu.profile)root.runAction('profile',[modelData])}
                                 }
                             }
                         }
@@ -401,7 +402,7 @@ Item {
                     Rectangle {
                         width:parent.width;height:132;radius:16;border.color:Qt.alpha(root.tint,0.45)
                         gradient:Gradient {GradientStop{position:0;color:Qt.alpha(root.tint,0.13)}GradientStop{position:1;color:root.card}}
-                        CpuChip {x:14;y:6;width:120;height:120;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Color.background;glint:root.ink;animate:false}
+                        CpuChip {x:14;y:6;width:120;height:120;busy:root.cpu.busyPct || 0;cores:root.coreLoads;tint:root.tint;stops:root.rampStops;dieFill:Commons.Color.background;glint:root.ink;animate:false}
                         Column {x:150;y:24;spacing:6
                             Heading{text:'CPU PULSE';font.pixelSize:22;font.letterSpacing:3}
                             Label{text:'Your processor, in motion.';font.pixelSize:11}
@@ -423,7 +424,7 @@ Item {
                     Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:11;text:'History stays on this machine in a private state directory. CPU Pulse reads unprivileged kernel counters only; it never terminates a process, renices, pins affinity or locks a frequency.'}
                 }
                 Rectangle{width:parent.width;height:1;color:root.rule}
-                Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:10;color:root.stale?Color.urgent:root.inkDim;text:root.actionStatus || (root.stale?'Telemetry is offline. Check the cpu-pulse user service.': 'LIVE · updated '+Qt.formatTime(new Date(root.cpu.ts*1000),'h:mm:ss AP')+'  ·  History stays on this machine  ·  Esc closes')}
+                Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:10;color:root.stale?Commons.Color.urgent:root.inkDim;text:root.actionStatus || (root.stale?'Telemetry is offline. Check the cpu-pulse user service.': 'LIVE · updated '+Qt.formatTime(new Date(root.cpu.ts*1000),'h:mm:ss AP')+'  ·  History stays on this machine  ·  Esc closes')}
         }
     }
 }

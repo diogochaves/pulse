@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 import "GpuModel.js" as Model
 import "Constraints.js" as Constraints
@@ -30,7 +31,7 @@ Item {
     // dims the bar's own ink rather than using a colour picked to sit on a
     // surface that is not there.
     readonly property bool barTransparent: root.bar ? root.bar.transparent === true : false
-    readonly property color barInk: root.bar ? root.bar.barForeground : Color.foreground
+    readonly property color barInk: root.bar ? root.bar.barForeground : Commons.Color.foreground
     readonly property color barTint: (root.stale && root.barTransparent) ? Util.alpha(root.barInk, 0.55) : root.tint
     readonly property color barCaptionInk: (root.barTransparent && root.stale) ? root.barInk : root.tint
     readonly property bool cardLive: host.opened && host.active === 'overview' && !root.stale && root.setting('animated', true)
@@ -50,7 +51,7 @@ Item {
     property var gpu: ({})
     property string version: ''
     property string palette: ''
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)
@@ -60,13 +61,13 @@ Item {
     // VRAM keeps a colour of its own everywhere it appears, because it is a
     // different question from "is it working" and the two must not be read as
     // one number.
-    readonly property color memTint: root.stale ? Color.muted : Model.ramp(root.gpu.memUsedPct, rampStops)
+    readonly property color memTint: root.stale ? Commons.Color.muted : Model.ramp(root.gpu.memUsedPct, rampStops)
     // The chip's memory band stays on the ramp: it is a gauge, and a card that
     // is nearly full should go red. A trace on a chart is not a gauge, and
     // tinting it by its own value put the VRAM line and the temperature line in
     // the same warm register at exactly the moment they both mattered. The
     // graph gets a stable colour instead.
-    readonly property color memTrace: root.stale ? Color.muted : Color.accent
+    readonly property color memTrace: root.stale ? Commons.Color.muted : Commons.Color.accent
     property var histories: ({})
     property int tab: 0
     property int page: 0
@@ -76,7 +77,7 @@ Item {
     property real now: Date.now()/1000
     readonly property bool stale: !gpu.ts || now-gpu.ts > 15
     readonly property int mode: Model.clamp(setting('displayMode',0),0,3)
-    readonly property color tint: stale ? Color.muted : Model.ramp(gpu.busyPct, rampStops)
+    readonly property color tint: stale ? Commons.Color.muted : Model.ramp(gpu.busyPct, rampStops)
     readonly property var cards: gpu.cards || []
     readonly property var rows: gpu.hogs || []
     onRowsChanged: page=Math.min(page,Math.max(0,Math.ceil(rows.length/8)-1))
@@ -136,7 +137,7 @@ Item {
         onLoaded:{root.palette=text()}
     }
     Connections {
-        target:Color
+        target:Commons.Color
         function onBackgroundChanged() {paletteFile.reload()}
         function onAccentChanged() {paletteFile.reload()}
     }
@@ -181,9 +182,9 @@ Item {
 
     readonly property string headline: root.stale ? '—' : Model.readout(root.gpu, root.mode)
     readonly property string tag: Model.modeTag(root.mode)
-    property Component barChip: Component { GpuChip {compact:true;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.barTint;memTint:root.memTint;body:root.barTransparent?'transparent':Color.background;glint:root.barInk;animate:!root.stale && root.setting('animated',true)} }
-    property Component cardChip: Component { GpuChip {width:88;height:88;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Color.popups.background;glint:root.ink;animate:root.cardLive} }
-    property Component cardGraph: Component { GpuHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;heat:root.heat;memTint:root.memTrace;ink:root.ink;surface:Color.popups.background} }
+    property Component barChip: Component { GpuChip {compact:true;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.barTint;memTint:root.memTint;body:root.barTransparent?'transparent':Commons.Color.background;glint:root.barInk;animate:!root.stale && root.setting('animated',true)} }
+    property Component cardChip: Component { GpuChip {width:88;height:88;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Commons.Color.popups.background;glint:root.ink;animate:root.cardLive} }
+    property Component cardGraph: Component { GpuHistoryGraph {axesVisible:false;historyData:root.chart;tint:root.tint;heat:root.heat;memTint:root.memTrace;ink:root.ink;surface:Commons.Color.popups.background} }
 
     component Label: Text {
         color:root.inkDim;font.pixelSize:12;textFormat:Text.PlainText
@@ -248,7 +249,7 @@ Item {
                 Rectangle {
                     width:parent.width;height:170;radius:16;border.color:Qt.alpha(root.tint,0.45)
                     gradient:Gradient {GradientStop{position:0;color:Qt.alpha(root.tint,0.13)}GradientStop{position:1;color:root.card}}
-                    GpuChip {x:12;y:5;width:160;height:160;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Color.popups.background;glint:root.ink;animate:root.opened && !root.stale && root.setting('animated',true)}
+                    GpuChip {x:12;y:5;width:160;height:160;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Commons.Color.popups.background;glint:root.ink;animate:root.opened && !root.stale && root.setting('animated',true)}
                     Column {x:188;y:20;spacing:6
                         Label{text:root.gpu.present===false?'NO GPU DETECTED':'GRAPHICS BUSY';font.pixelSize:11;font.letterSpacing:2}
                         Row {spacing:10
@@ -277,7 +278,7 @@ Item {
                                 Action{required property var modelData;text:modelData.t;selected:root.range===modelData.s;implicitHeight:28;onClicked:root.range=modelData.s}
                             }
                         }
-                        GpuHistoryGraph{width:parent.width;height:111;historyData:root.chart;tint:root.tint;heat:root.heat;memTint:root.memTrace;ink:root.ink;surface:Color.popups.background}
+                        GpuHistoryGraph{width:parent.width;height:111;historyData:root.chart;tint:root.tint;heat:root.heat;memTint:root.memTrace;ink:root.ink;surface:Commons.Color.popups.background}
                         Row{spacing:14
                             Label{text:'● busy';color:root.tint;font.pixelSize:10}
                             Label{text:'● VRAM';color:root.memTrace;font.pixelSize:10}
@@ -399,7 +400,7 @@ Item {
                 Rectangle {
                     width:parent.width;height:132;radius:16;border.color:Qt.alpha(root.tint,0.45)
                     gradient:Gradient {GradientStop{position:0;color:Qt.alpha(root.tint,0.13)}GradientStop{position:1;color:root.card}}
-                    GpuChip {x:14;y:6;width:120;height:120;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Color.background;glint:root.ink;animate:false}
+                    GpuChip {x:14;y:6;width:120;height:120;busy:root.gpu.busyPct || 0;vram:root.gpu.memUsedPct || 0;tint:root.tint;memTint:root.memTint;body:Commons.Color.background;glint:root.ink;animate:false}
                     Column {x:150;y:24;spacing:6
                         Heading{text:'GPU PULSE';font.pixelSize:22;font.letterSpacing:3}
                         Label{text:'Your graphics, in motion.';font.pixelSize:11}
@@ -422,7 +423,7 @@ Item {
                 Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:11;text:'History stays on this machine in a private state directory. GPU Pulse reads unprivileged driver and kernel counters only; it never sets a clock, a power limit, a fan curve or a persistence mode, and it never stops a process.'}
             }
             Rectangle{width:parent.width;height:1;color:root.rule}
-            Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:10;color:root.stale?Color.urgent:root.inkDim
+            Label{width:parent.width;wrapMode:Text.WordWrap;font.pixelSize:10;color:root.stale?Commons.Color.urgent:root.inkDim
                 text:Model.recorderStatus(root.actionStatus,root.stale,root.gpu.present,root.gpu.reason,Qt.formatTime(new Date(root.gpu.ts*1000),'h:mm:ss AP'))}
         }
     }

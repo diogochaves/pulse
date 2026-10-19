@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import qs.Commons
+import qs.Commons as Commons
 import qs.Ui
 
 // What this plugin is, what it replaced, and where each part came from.
@@ -12,7 +13,7 @@ Item {
     width: parent ? parent.width : 0
     implicitHeight: column.implicitHeight
 
-    readonly property color ink: Color.popups.text
+    readonly property color ink: Commons.Color.popups.text
     readonly property color inkDim: Util.alpha(ink, 0.66)
     readonly property color card: Util.alpha(ink, 0.05)
     readonly property color cardEdge: Util.alpha(ink, 0.15)
@@ -113,8 +114,8 @@ Item {
                 width: siteText.implicitWidth + 40
                 height: 44
                 radius: 10
-                color: siteArea.containsMouse ? Qt.alpha(Color.accent, 0.26) : Qt.alpha(Color.accent, 0.14)
-                border.color: Qt.alpha(Color.accent, siteArea.containsMouse ? 0.9 : 0.55)
+                color: siteArea.containsMouse ? Qt.alpha(Commons.Color.accent, 0.26) : Qt.alpha(Commons.Color.accent, 0.14)
+                border.color: Qt.alpha(Commons.Color.accent, siteArea.containsMouse ? 0.9 : 0.55)
                 border.width: 2
                 Behavior on color { ColorAnimation { duration: 120 } }
                 Text {

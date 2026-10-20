@@ -146,8 +146,15 @@ function cpu(c, stale) {
                         : saturated + ' of ' + threads + ' threads are effectively full, so anything single-threaded is now competing for what is left.',
         threads ? saturated / threads : 0))
 
+    // With fan duty known, heat says which knob is left: fans already at full
+    // mean the cooler is the limit, slow fans mean the fan curve has room.
+    var duty = null, fans = c.fans || []
+    for (var f = 0; f < fans.length; f++) if (fans[f].duty !== null && fans[f].duty !== undefined && fans[f].rpm > 0) duty = Math.max(duty === null ? 0 : duty, fans[f].duty)
+    var cooling = duty === null || !(c.temp >= 80) ? ''
+        : duty >= 95 ? ' The fans are already at full speed, so the cooler itself is the limit.'
+        : ' The fastest fan is at ' + Math.round(duty) + '%, so the fan curve still has room.'
     out.push(entry('thermal', 'Package temperature', deg(c.temp),
-        'Sustained heat is what makes a laptop clock down. Above 90°C the processor is trading speed for survival.',
+        'Sustained heat is what makes a laptop clock down. Above 90°C the processor is trading speed for survival.' + cooling,
         ramp(c.temp, 80, 95)))
 
     out.push(entry('pressure', 'Scheduler pressure', pct(some.avg60),

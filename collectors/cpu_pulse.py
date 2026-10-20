@@ -212,6 +212,36 @@ def temperatures():
                 sensors.append({'label': kind, 'temp': value})
     return package if package is not None else fallback, cores, sensors[:16]
 
+# GPU drivers report their own fans, and GPU Pulse shows those.
+HWMON = Path('/sys/class/hwmon')
+GPU_HWMON = ('amdgpu', 'radeon', 'nouveau')
+
+def fans(seen=()):
+    """Fan speed from every hwmon chip that has it: the board's Super I/O
+    (nct6683, nct6775, it87...), a laptop's EC. Most boards wire fewer fans than
+    the chip has headers, and an empty header reads 0 RPM just like a fan that
+    stopped in zero-RPM mode, so a header shows only once it has spun: seen is
+    the keys reported last tick. No fan files at all (often the Super I/O
+    driver is simply not loaded) gives an empty list, never a 0.
+
+    pwmN is paired with fanN as the duty driving it. The ABI does not promise
+    that pairing, but the common Super I/O drivers follow it."""
+    out = []
+    for h in sorted(HWMON.glob('hwmon*')):
+        chip = read(h / 'name').strip()
+        if chip in GPU_HWMON:
+            continue
+        for f in sorted(h.glob('fan*_input'), key=lambda f: int(re.sub(r'\D', '', f.name) or 0)):
+            rpm = read_int(f)
+            n = re.sub(r'\D', '', f.name)
+            key = f'{chip}/fan{n}'
+            if rpm is None or (rpm <= 0 and key not in seen):
+                continue
+            pwm = read_int(h / f'pwm{n}')
+            out.append({'key': key, 'label': read(h / f'fan{n}_label').strip() or f'fan{n}', 'rpm': rpm,
+                        'duty': pwm / 255 * 100 if pwm is not None and 0 <= pwm <= 255 else None})
+    return out[:16]
+
 def frequency():
     base = SYS_CPU / 'cpu0/cpufreq'
     for candidate in sorted(SYS_CPU.glob('cpu[0-9]*/cpufreq')):
@@ -289,6 +319,7 @@ def metrics(previous=None):
     elapsed = monotonic - previous['monotonic'] if previous else 0
     busy, breakdown = usage(rows['cpu'], old.get('cpu'))
     core_temp, core_temps, sensors = temperatures()
+    fan_list = fans({f['key'] for f in previous.get('fans', [])} if previous else ())
     cores = []
     for name in sorted((k for k in rows if k != 'cpu'), key=lambda k: int(k[3:])):
         index = int(name[3:])
@@ -355,7 +386,7 @@ def metrics(previous=None):
             'threads': threads, 'physical': physical, 'model': model[:80],
             'load': [load1, load5, load15], 'loadPct': load1 / threads * 100,
             'running': counters.get('procs_running', 0), 'blocked': counters.get('procs_blocked', 0),
-            'psi': psi, 'rates': rates, 'counters': counters, 'freq': freq, 'temp': core_temp, 'sensors': sensors,
+            'psi': psi, 'rates': rates, 'counters': counters, 'freq': freq, 'temp': core_temp, 'sensors': sensors, 'fans': fan_list,
             'throttle': throttle, 'watts': watts, 'energy': energy,
             'profile': current_profile(),
             'uptime': float((read('/proc/uptime').split() or ['0'])[0]), 'raw': rows}
